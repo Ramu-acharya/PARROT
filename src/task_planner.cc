@@ -11,6 +11,9 @@
 
 #include "task_planner.hh"
 #include "constants.hh"
+#include <algorithm>  // Add this line to include the necessary header
+#include <vector>
+#include <cmath>  // Include cmath for the sqrt function
 
 TaskPlanner::TaskPlanner(int num_robots)
 {
@@ -65,7 +68,6 @@ std::vector<int> TaskPlanner::assign_pallets_to_robots_simple(std::vector<std::v
 std::vector<int> TaskPlanner::assign_pallets_to_robots_heuristic(std::vector<std::vector<double>> robot_poses,
                                                                  std::vector<std::vector<double>> pallet_and_goal_poses)
 {
-
     // Create task assigments vector full of -1s
     std::vector<int> task_assignments(this->num_robots, -1);
 
@@ -78,7 +80,8 @@ std::vector<int> TaskPlanner::assign_pallets_to_robots_heuristic(std::vector<std
         std::vector<double> pallet_to_robot_distance;
         for (int j = 0; j < robot_poses.size(); j++)
         {
-            pallet_to_robot_distance.push_back(sqrt(pow(pallet_and_goal_poses[i][0] - robot_poses[j][0], 2) + pow(pallet_and_goal_poses[i][1] - robot_poses[j][1], 2)));
+            pallet_to_robot_distance.push_back(sqrt(pow(pallet_and_goal_poses[i][0] - robot_poses[j][0], 2) +
+                                                    pow(pallet_and_goal_poses[i][1] - robot_poses[j][1], 2)));
         }
         pallet_to_robot_distances.push_back(pallet_to_robot_distance);
     }
@@ -134,20 +137,12 @@ void TaskPlanner::unassign_pallet_from_robot(int robot_id)
     this->task_assignments[robot_id] = -1;
 
     // find the index of the pallet in the dropped off pallets vector
-    int index = -1;
-    for (int i = 0; i < this->dropped_off_pallets.size(); i++)
-    {
-        if (this->dropped_off_pallets[i] == pallet_id)
-        {
-            index = i;
-            break;
-        }
-    }
+    auto it = std::find(this->dropped_off_pallets.begin(), this->dropped_off_pallets.end(), pallet_id);
 
-    // remove the pallet from the dropped off pallets vector
-    if (index != -1)
+    // remove the pallet from the dropped off pallets vector if found
+    if (it != this->dropped_off_pallets.end())
     {
-        this->dropped_off_pallets.erase(this->dropped_off_pallets.begin() + index);
+        this->dropped_off_pallets.erase(it);
     }
 }
 

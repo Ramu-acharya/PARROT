@@ -10,7 +10,7 @@ import threading
 import time as time
 import math
 import os
-import cv2 as cv
+import cv2 as cv2
 from multiprocessing import Process
 
 # cd build and make the c++ code
@@ -167,8 +167,8 @@ if __name__ == '__main__':
             computerVision.cv_visualize(paths, targetPoses, velRightLinears, velLeftLinears, ffterm, fbkterm)
             if (np.shape(vizImage[0]) > (0,0)):
                 print(np.shape(vizImage[0]))
-                cv.imshow("Visualizer", vizImage[0])
-                cv.waitKey(1)
+                cv2.imshow("Visualizer", vizImage[0])
+                cv2.waitKey(1)
             end = time.time()
             # print("Frame Rate: ", 1 / (end - start))
 

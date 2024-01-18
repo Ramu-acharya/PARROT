@@ -1,5 +1,5 @@
 #!/bin/sh
-
+mkdir build
 # Build the c++ code
 cd build
 cmake ..

@@ -28,7 +28,7 @@ GOAL_FIDUCIALS = [9,11,15,13,14]
 # Uses same index as ROBOT_FIDUCIALS
 ROBOT_HARDWARE_NUMBERS = [3, 1, 2]
 
-WEBCAM_ID = 2 # Saral
+WEBCAM_ID = 5# Saral
 # WEBCAM_ID = 1 # Prithu
 
 CV_VIZ_SCALE = 0.35

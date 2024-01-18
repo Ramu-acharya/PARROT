@@ -9,7 +9,7 @@ is different from the robot coordinate system.
 from dis import code_info
 from distutils.log import debug
 from turtle import position
-import cv2 as cv
+import cv2 as cv2
 import numpy as np
 import time 
 from cv_fiducial import CV_Fiducial
@@ -25,7 +25,7 @@ import threading
 cvImage = None
 def updateImage():
     global cvImage
-    cap = cv.VideoCapture(constants.WEBCAM_ID)
+    cap = cv2.VideoCapture(constants.WEBCAM_ID)
     print("Thread created")
     while(True):
         ret, frame = cap.read()
@@ -111,7 +111,7 @@ class CV:
         self.visualizerField = self.latestSandboxImage.copy()
         scale = constants.CV_VIZ_SCALE
         dsize = (int(self.visualizerField.shape[1] * scale), int(self.visualizerField.shape[0] * scale))
-        self.visualizerField = cv.resize(self.visualizerField, dsize)
+        self.visualizerField = cv2.resize(self.visualizerField, dsize)
 
         robotPositions = None
         if constants.CV_LOCALIZE_ROBOTS_FIDUCIALS == False:
@@ -126,7 +126,7 @@ class CV:
             (robot_pos_x, robot_pos_y, robot_rotation_rad) = robotPose
             start_point = (int(robot_pos_x*scale), int(robot_pos_y*scale))
             end_point = (int(robot_pos_x*scale + 100*scale*np.cos(robot_rotation_rad)), int(robot_pos_y*scale - 100*scale*np.sin(robot_rotation_rad)))
-            cv.arrowedLine(self.visualizerField, start_point, end_point, (255, 0, 0), 2)
+            cv2.arrowedLine(self.visualizerField, start_point, end_point, (255, 0, 0), 2)
         
             # # 5. Visualize the robot's indivigual speeds
             # # Left wheel position 5 cm to the left of the robot pose
@@ -139,8 +139,8 @@ class CV:
             # leftArrowEnd = (int(robot_pos_x - 50*np.sin(robot_rotation_rad) + leftMag * np.cos(robot_rotation_rad)), int(robot_pos_y - 50*np.cos(robot_rotation_rad) - leftMag*np.sin(robot_rotation_rad)))
             # rightArrowEnd = (int(robot_pos_x + 50*np.sin(robot_rotation_rad) + rightMag * np.cos(robot_rotation_rad)), int(robot_pos_y + 50*np.cos(robot_rotation_rad) - rightMag*np.sin(robot_rotation_rad)))
 
-            # cv.arrowedLine(self.visualizerField, leftArrowStart, leftArrowEnd, (100, 0, 0), 2)
-            # cv.arrowedLine(self.visualizerField, rightArrowStart, rightArrowEnd, (0, 0, 100), 2)
+            # cv2.arrowedLine(self.visualizerField, leftArrowStart, leftArrowEnd, (100, 0, 0), 2)
+            # cv2.arrowedLine(self.visualizerField, rightArrowStart, rightArrowEnd, (0, 0, 100), 2)
 
             # 6. Visualize the robot direction vector
             robotRightSpeed = robotRightSpeeds[i]
@@ -150,7 +150,7 @@ class CV:
             angle += robot_rotation_rad
             start_point = (int(robot_pos_x*scale), int(robot_pos_y*scale))
             end_point = (int(robot_pos_x*scale + magnitude*scale * np.cos(angle)), int(robot_pos_y*scale - magnitude*scale * np.sin(angle)))
-            cv.arrowedLine(self.visualizerField, start_point, end_point, (255, 255, 255), 2)
+            cv2.arrowedLine(self.visualizerField, start_point, end_point, (255, 255, 255), 2)
 
 
 
@@ -162,7 +162,7 @@ class CV:
         #     (pallet_pos_x, pallet_pos_y, pallet_rotation_rad) = palletPose
         #     start_point = (int(pallet_pos_x), int(pallet_pos_y))
         #     end_point = (int(pallet_pos_x + 100*np.cos(pallet_rotation_rad)), int(pallet_pos_y - 100*np.sin(pallet_rotation_rad)))
-        #     cv.arrowedLine(self.visualizerField, start_point, end_point, (0, 0, 255), 2)
+        #     cv2.arrowedLine(self.visualizerField, start_point, end_point, (0, 0, 255), 2)
         
         # 3. Visualize the current path (assume it's a dict with keys being robot ID)
         for i in range(len(robotPaths)):
@@ -172,7 +172,7 @@ class CV:
                 (robot_pos_x, robot_pos_y, robot_rotation_rad, time, tag) = pose
                 start_point = (int(robot_pos_x*scale), int(robot_pos_y*scale))
                 end_point = (int(robot_pos_x*scale + 20*scale*np.cos(robot_rotation_rad)), int(robot_pos_y*scale - 20*scale*np.sin(robot_rotation_rad)))
-                cv.arrowedLine(self.visualizerField, start_point, end_point, color, 2)
+                cv2.arrowedLine(self.visualizerField, start_point, end_point, color, 2)
 
         # 4. Visualize the target pose
         for targetPose in targetPoses:
@@ -180,7 +180,7 @@ class CV:
             (target_pos_x, target_pos_y, target_rotation_rad) = targetPose
             start_point = (int(target_pos_x*scale), int(target_pos_y*scale))
             end_point = (int(target_pos_x*scale + 20*scale*np.cos(target_rotation_rad)), int(target_pos_y*scale - 20*scale*np.sin(target_rotation_rad)))
-            cv.arrowedLine(self.visualizerField, start_point, end_point, (28, 121, 225), 2)
+            cv2.arrowedLine(self.visualizerField, start_point, end_point, (28, 121, 225), 2)
 
                     
         if(constants.CV_VISUALIZE_PATH):
@@ -189,8 +189,8 @@ class CV:
         if(constants.CV_VISUALIZE_ACTUAL_PATH):
             pass
         
-        cv.imshow("Visualizer", self.visualizerField)
-        cv.waitKey(1)
+        cv2.imshow("Visualizer", self.visualizerField)
+        cv2.waitKey(1)
     def cv_getPalletPositionsOffset(self):
         # Generates a list of pallet positions with the offset applied
         palletPositions = self.cv_fiducial.cv_fiducial_getPalletPositions()
@@ -245,8 +245,8 @@ class CV:
         latestImageWarped = self.cv_fiducial.cv_fiducial_flattenSandboxImage(self._cv_CaptureImage())
 
         if constants.CV_DEBUG:
-            cv.imshow("Warped Image", latestImageWarped)
-            cv.waitKey(0)
+            cv2.imshow("Warped Image", latestImageWarped)
+            cv2.waitKey(0)
 
         maskedLedImage, robotLedCenters, numLeds, ledRGBvals = self._cv_extractLEDpositions(latestImageWarped)
         self.robotCount = round(numLeds/constants.CV_LEDS_PER_ROBOT)
@@ -273,9 +273,9 @@ class CV:
             time.sleep(0.1)
         return cvImage
         # if constants.CV_USE_CAMERA == False:
-        #     image = cv.imread(constants.CV_DEBUG_IMAGE_PATH)
-        #     cv.imshow("Source Image", image)
-        #     cv.waitKey(0)
+        #     image = cv2.imread(constants.CV_DEBUG_IMAGE_PATH)
+        #     cv2.imshow("Source Image", image)
+        #     cv2.waitKey(0)
         #     return image
 
         # ret, frame = cap.read()
@@ -283,8 +283,8 @@ class CV:
         #     ret, frame = cap.read()
         #     print("Waiting for camera to initialize...")
         # if constants.CV_DEBUG:
-        #     cv.imshow("Source Image", frame)
-        #     cv.waitKey(0)
+        #     cv2.imshow("Source Image", frame)
+        #     cv2.waitKey(0)
         # return frame
 
     def _cv_extractLEDpositions(self, img):
@@ -295,31 +295,31 @@ class CV:
         #  #apply a varience filter to the image
         color_filter_lower_bound = constants.CV_ROBOT_VARIENCE_LOWER_BOUND
         color_filter_upper_bound = constants.CV_ROBOT_VARIENCE_UPPER_BOUND
-        img_hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
-        mask = cv.inRange(img_hsv, color_filter_lower_bound, color_filter_upper_bound)
-        img_filtered = cv.bitwise_and(img, img, mask=mask)
+        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(img_hsv, color_filter_lower_bound, color_filter_upper_bound)
+        img_filtered = cv2.bitwise_and(img, img, mask=mask)
 
         if constants.CV_DEBUG:
-            cv.imshow("LED varience masked image", img_filtered)
-            cv.waitKey(0)
+            cv2.imshow("LED varience masked image", img_filtered)
+            cv2.waitKey(0)
 
         # erode and dilate to remove noise
         kernel = np.ones((3,3),np.uint8)
-        img_filtered = cv.erode(img_filtered,kernel,iterations = 1)
-        img_filtered = cv.dilate(img_filtered,kernel,iterations = 3)
+        img_filtered = cv2.erode(img_filtered,kernel,iterations = 1)
+        img_filtered = cv2.dilate(img_filtered,kernel,iterations = 3)
 
         if constants.CV_DEBUG:
-            cv.imshow("LED varience mask refined image", img_filtered)
-            cv.waitKey(0)
+            cv2.imshow("LED varience mask refined image", img_filtered)
+            cv2.waitKey(0)
 
         
         # Find all circles that meet a certain size, and create a mask
         mask = np.zeros(img_filtered.shape[:2], np.uint8)
-        img_filtered_gray = cv.cvtColor(img_filtered, cv.COLOR_BGR2GRAY)
+        img_filtered_gray = cv2.cvtColor(img_filtered, cv2.COLOR_BGR2GRAY)
         img_filtered_gray_text = img_filtered_gray.copy()
-        circles = cv.HoughCircles(\
+        circles = cv2.HoughCircles(\
             img_filtered_gray, \
-            cv.HOUGH_GRADIENT, \
+            cv2.HOUGH_GRADIENT, \
             1, \
             minDist = constants.CV_PIXEL_DISTANCE_BETWEEN_LEDS, \
             param1 = constants.CV_CIRCLE_PARAM1, \
@@ -332,42 +332,42 @@ class CV:
             circles = np.round(circles[0, :]).astype("int")
             # loop over the (x, y) coordinates and radius of the circles
             for (x, y, r) in circles:
-                mask = cv.circle(mask, (x, y), int(r * constants.CV_CIRCLE_MASK_MULTIPLIER), (255, 255, 255), -1)
+                mask = cv2.circle(mask, (x, y), int(r * constants.CV_CIRCLE_MASK_MULTIPLIER), (255, 255, 255), -1)
                 # draw the circle in the output image, then draw a rectangle
                 # corresponding to the center of the circle
                 if constants.CV_DEBUG:
-                    cv.circle(img_filtered_gray_text, (x, y), r, (0, 255, 0), 4)
-                    cv.rectangle(img_filtered_gray_text, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-                    cv.putText(img_filtered_gray_text, str(r), (x,y), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1, cv.LINE_AA)
+                    cv2.circle(img_filtered_gray_text, (x, y), r, (0, 255, 0), 4)
+                    cv2.rectangle(img_filtered_gray_text, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+                    cv2.putText(img_filtered_gray_text, str(r), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255), 1, cv2.LINE_AA)
             if constants.CV_DEBUG:
                 # show the output image
-                cv.imshow("circles found", img_filtered_gray_text)
-                cv.waitKey(0)
+                cv2.imshow("circles found", img_filtered_gray_text)
+                cv2.waitKey(0)
         else: 
             debugPrint("No circles found")
         
         # Apply the mask to the image
-        img_filtered_gray = cv.bitwise_and(img_filtered_gray, img_filtered_gray, mask=mask) 
+        img_filtered_gray = cv2.bitwise_and(img_filtered_gray, img_filtered_gray, mask=mask) 
         if constants.CV_DEBUG:
-            cv.imshow("Masked Image with circles", img_filtered_gray)
-            cv.waitKey(0)
+            cv2.imshow("Masked Image with circles", img_filtered_gray)
+            cv2.waitKey(0)
 
         # Convert to grayscale and find moments on the thresholded img
-        # gray_img_filtered = cv.cvtColor(img_filtered, cv.COLOR_BGR2GRAY)
-        ret, thresh = cv.threshold(img_filtered_gray, 50, 255, 0)
+        # gray_img_filtered = cv2.cvtColor(img_filtered, cv2.COLOR_BGR2GRAY)
+        ret, thresh = cv2.threshold(img_filtered_gray, 50, 255, 0)
 
         if constants.CV_DEBUG:
-            cv.imshow("LED varience mask refined threshold image", thresh)
-            cv.waitKey(0)
+            cv2.imshow("LED varience mask refined threshold image", thresh)
+            cv2.waitKey(0)
 
-        contours, hierarchy = cv.findContours(thresh, 1, 2)
+        contours, hierarchy = cv2.findContours(thresh, 1, 2)
 
         ledRGB = np.zeros((len(contours), 3))
         centers = np.empty([len(contours), 2])
         areas = np.empty([len(contours), 1])
         for i in range(0, len(contours)):
-            Mi = cv.moments(contours[i])
-            area = cv.contourArea(contours[i])
+            Mi = cv2.moments(contours[i])
+            area = cv2.contourArea(contours[i])
             # jank in range function
             if Mi['m00'] != 0 and (min(constants.CV_MIN_LED_AREA, constants.CV_MAX_LED_AREA) < area < max(constants.CV_MIN_LED_AREA, constants.CV_MAX_LED_AREA)):
                 centers[i,0]= Mi['m10']/Mi['m00'] # x coordinate
@@ -383,17 +383,17 @@ class CV:
                 #   Use the center of the contourMaskedImg
                 #   Use kmeans lol
                 # contourMask = np.zeros(img.shape, np.uint8)
-                # cv.drawContours(contourMask, contours, i, (255,255,255), -1)
-                # contourMaskedImg = cv.bitwise_and(img, contourMask)
+                # cv2.drawContours(contourMask, contours, i, (255,255,255), -1)
+                # contourMaskedImg = cv2.bitwise_and(img, contourMask)
 
 
         if(constants.CV_DEBUG):
             for i in range(0, len(contours)):
-                cv.circle(img_filtered_gray, (int(centers[i, 0]), int(centers[i, 1])), 2, (0, 0, 255), -1)
-                cv.putText(img_filtered_gray, str(ledRGB[i]), (int(centers[i, 0]), int(centers[i, 1])), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv.LINE_AA)
-                # cv.putText(img_filtered_gray, str(areas[i]), (int(centers[i, 0]), int(centers[i, 1])), cv.FONT_HERSHEY_SIMPLEX,q 1, (255, 255, 255), 1, cv.LINE_AA) 
-            cv.imshow('countours', img_filtered_gray)
-            cv.waitKey(0)
+                cv2.circle(img_filtered_gray, (int(centers[i, 0]), int(centers[i, 1])), 2, (0, 0, 255), -1)
+                cv2.putText(img_filtered_gray, str(ledRGB[i]), (int(centers[i, 0]), int(centers[i, 1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
+                # cv2.putText(img_filtered_gray, str(areas[i]), (int(centers[i, 0]), int(centers[i, 1])), cv2.FONT_HERSHEY_SIMPLEX,q 1, (255, 255, 255), 1, cv2.LINE_AA) 
+            cv2.imshow('countours', img_filtered_gray)
+            cv2.waitKey(0)
         
         return img_filtered, centers, len(contours), ledRGB
 
@@ -444,7 +444,7 @@ class CV:
         for permToTry in permusToTry:
             for permToMatch in permusToMatch:
                 try:
-                    transform, inliers = cv.estimateAffinePartial2D(np.array(permToTry), np.array(permToMatch)) #todo: there are other params like condience and refine iters that can make this better
+                    transform, inliers = cv2.estimateAffinePartial2D(np.array(permToTry), np.array(permToMatch)) #todo: there are other params like condience and refine iters that can make this better
                     if np.count_nonzero(inliers) > most_inliers:
                         best_transform = transform
                         most_inliers = np.count_nonzero(inliers)
@@ -469,7 +469,7 @@ class CV:
 
         # try:
         #     for p in permus:
-        #         transform, inliers = cv.estimateaffinepartial2d(np.array(p), robot_template_points) #todo: there are other params like condience and refine iters that can make this better
+        #         transform, inliers = cv2.estimateaffinepartial2d(np.array(p), robot_template_points) #todo: there are other params like condience and refine iters that can make this better
         #         if np.count_nonzero(inliers) > most_inliers:
         #             best_transform = transform
         #             most_inliers = np.count_nonzero(inliers)
@@ -493,7 +493,7 @@ def apply_transformation_matrix(img, transformation_matrix):
     '''
     # get img size
     h, w = img.shape[:2]
-    return cv.warpAffine(img, transformation_matrix, (w, h))
+    return cv2.warpAffine(img, transformation_matrix, (w, h))
 
 
 

@@ -17,7 +17,7 @@ objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 
 if (captureImage):
-    cap = cv.VideoCapture(0)
+    cap = cv.VideoCapture(5)
     ret = False
     while (not ret):
         _, img = cap.read()

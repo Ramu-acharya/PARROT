@@ -6,14 +6,14 @@ import math
 from tkinter import E
 from turtle import position
 from unicodedata import name
-import cv2 as cv
+import cv2 as cv2
 import numpy as np
 import os
 import time 
 import constants
 from constants import debugPrint
 
-# cap = cv.VideoCapture(0)
+# cap = cv2.VideoCapture(0)
 debug = True
 
 class CV_Fiducial:
@@ -34,8 +34,8 @@ class CV_Fiducial:
         sandboxImage = self.cv_fiducial_flattenSandboxImage(image_frame)
 
         if constants.CV_DEBUG:
-            cv.imshow("Sandbox Init Image", sandboxImage)
-            cv.waitKey(0)
+            cv2.imshow("Sandbox Init Image", sandboxImage)
+            cv2.waitKey(0)
 
         return sandboxImage
 
@@ -45,9 +45,9 @@ class CV_Fiducial:
         if constants.CV_DEBUG:
             image_frame_annotated = image_frame.copy()
 
-        arucoDict = cv.aruco.Dictionary_get(cv.aruco.DICT_4X4_50)
-        arucoParams = cv.aruco.DetectorParameters_create()
-        corner_list, fiducial_ids, _ = cv.aruco.detectMarkers(image_frame, arucoDict, parameters=arucoParams)
+        arucoDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+        arucoParams = cv2.aruco.DetectorParameters()
+        corner_list, fiducial_ids, _ = cv2.aruco.detectMarkers(image_frame, arucoDict, parameters=arucoParams)
 
         if len(corner_list) > 0:
             fiducial_ids = fiducial_ids.flatten()
@@ -71,7 +71,7 @@ class CV_Fiducial:
                 # reserve the extra processing for the corner fiducials
                 if fiducial_id in constants.CORNER_FIDUCIALS:
                     # estimate the pose of the marker
-                    rvec, tvec, markerPoints = cv.aruco.estimatePoseSingleMarkers(\
+                    rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(\
                         marker_corner, \
                         constants.FIDUCIAL_WIDTH_MM, \
                         constants.CAMERA_MATRIX, \
@@ -83,8 +83,8 @@ class CV_Fiducial:
                     # debugPrint("Fiducial ID, rvec: " + str(fiducial_id) + ", " + ", " + str(rvec))
 
                     # if constants.CV_DEBUG:
-                    #     # cv.aruco.drawDetectedMarkers(image_frame_annotated, corner_list)
-                    #     cv.drawFrameAxes(image_frame_annotated, constants.CAMERA_MATRIX, constants.DISTORTION_COEFFICIENTS, rvec, tvec, 20)
+                    #     # cv2.aruco.drawDetectedMarkers(image_frame_annotated, corner_list)
+                    #     cv2.drawFrameAxes(image_frame_annotated, constants.CAMERA_MATRIX, constants.DISTORTION_COEFFICIENTS, rvec, tvec, 20)
                 
                 self.cv_fiducial_cornerMarkerDict[fiducial_id] = (centerX, centerY, topLeft, topRight, bottomRight, bottomLeft, rvec, tvec)
 
@@ -93,9 +93,9 @@ class CV_Fiducial:
 
         if constants.CV_DEBUG:
             for fiducial_id in self.cv_fiducial_cornerMarkerDict.keys():
-                cv.circle(image_frame_annotated, self.cv_fiducial_cornerMarkerDict[fiducial_id][0:2], 4, (0, 0, 255), -1)
-            cv.imshow("Corner Pose", image_frame_annotated)
-            cv.waitKey(0)
+                cv2.circle(image_frame_annotated, self.cv_fiducial_cornerMarkerDict[fiducial_id][0:2], 4, (0, 0, 255), -1)
+            cv2.imshow("Corner Pose", image_frame_annotated)
+            cv2.waitKey(0)
 
         return True
         
@@ -105,9 +105,9 @@ class CV_Fiducial:
     '''
     def cv_fiducial_generatePalletLocations(self, sandbox_image):
 
-        arucoDict = cv.aruco.Dictionary_get(cv.aruco.DICT_4X4_50)
-        arucoParams = cv.aruco.DetectorParameters_create()
-        corner_list, fiducial_ids, _ = cv.aruco.detectMarkers(sandbox_image, arucoDict, parameters=arucoParams)
+        arucoDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+        arucoParams = cv2.aruco.DetectorParameters()
+        corner_list, fiducial_ids, _ = cv2.aruco.detectMarkers(sandbox_image, arucoDict, parameters=arucoParams)
 
         # debugPrint("Fiducial IDs detected in field: " + str(fiducial_ids))
 
@@ -146,7 +146,7 @@ class CV_Fiducial:
                 # reserve the extra processing for the robot fiducials
                 if fiducial_id in constants.ROBOT_FIDUCIALS and constants.CV_LOCALIZE_ROBOTS_FIDUCIALS:
                     # estimate the pose of the marker
-                    rvec, tvec, markerPoints = cv.aruco.estimatePoseSingleMarkers(\
+                    rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(\
                         marker_corner, \
                         constants.FIDUCIAL_WIDTH_MM, \
                         constants.CAMERA_MATRIX, \
@@ -156,12 +156,12 @@ class CV_Fiducial:
                     rvec = rvec.flatten()
                     tvec = tvec.flatten()
 
-                    rotMat = cv.Rodrigues(rvec)[0]
+                    rotMat = cv2.Rodrigues(rvec)[0]
                     rot = math.atan2(rotMat[1,0], rotMat[0,0])
                     
                     if constants.CV_DEBUG:
-                        # cv.aruco.drawDetectedMarkers(image_frame_annotated, corner_list)
-                        cv.drawFrameAxes(sandbox_image, constants.CAMERA_MATRIX, constants.DISTORTION_COEFFICIENTS, rvec, tvec, 20)
+                        # cv2.aruco.drawDetectedMarkers(image_frame_annotated, corner_list)
+                        cv2.drawFrameAxes(sandbox_image, constants.CAMERA_MATRIX, constants.DISTORTION_COEFFICIENTS, rvec, tvec, 20)
                 
                 
                 self.cv_fiducial_markerDict[fiducial_id] = (centerX, centerY, topLeft, topRight, bottomRight, bottomLeft, orientation)
@@ -227,8 +227,8 @@ class CV_Fiducial:
             self.cv_fiducial_cornerMarkerDict[bottom_right_id][0:2],
             self.cv_fiducial_cornerMarkerDict[bottom_left_id][0:2]], dtype = "float32")
 
-        M = cv.getPerspectiveTransform(fiducial_corners, destination_corners)
-        sandbox_image = cv.warpPerspective(image_frame, M, (height + (buffer_pixels_height * 2), width + (buffer_pixels_width * 2)))
+        M = cv2.getPerspectiveTransform(fiducial_corners, destination_corners)
+        sandbox_image = cv2.warpPerspective(image_frame, M, (height + (buffer_pixels_height * 2), width + (buffer_pixels_width * 2)))
 
         return sandbox_image
 
